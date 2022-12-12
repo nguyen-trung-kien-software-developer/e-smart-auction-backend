@@ -56,6 +56,12 @@ module.exports = (sequelize, DataTypes) => {
       zip_code: {
         type: DataTypes.STRING,
       },
+      wallet: {
+        type: DataTypes.INTEGER,
+      },
+      minimum_withdraw: {
+        type: DataTypes.STRING,
+      },
       is_active: {
         type: DataTypes.INTEGER,
       },

@@ -588,7 +588,6 @@ class SellerService {
 
       let oldSeller = await this.getSellerByEmail(email);
       
-
       if (oldSeller) {
         let oldProduct = await this.getProductDetailByProductId(productId, user) 
 
@@ -610,6 +609,166 @@ class SellerService {
     console.log(err)
     return false;
   }
+  }
+
+  getWallet = async (user) => {
+    try {
+      const { email, username, user_type } = user;
+
+      let oldSeller = await this.getSellerByEmail(email);
+
+      if (oldSeller) {
+        const wallet = {
+          current_amount: oldSeller.wallet,
+          minimum_withdraw: oldSeller.minimum_withdraw
+        };
+
+        if(!wallet) {
+          return false;
+        }
+
+        return wallet;
+      } else {
+        return false;
+      }
+      
+    } catch (error) {
+      return false
+    }
+  }
+
+  getSellerDashboard = async (user) => {
+    try {
+      const { email, username, user_type } = user;
+
+      let oldSeller = await this.getSellerByEmail(email);
+
+      if (oldSeller) {
+        const revenue = await sequelize.query(
+          `SELECT sum(successbids.win_bid_amount) AS revenue FROM successbids 
+            INNER JOIN products ON successbids.product_id = products.id
+            INNER JOIN sellers ON products.seller_id = sellers.id
+            WHERE sellers.id = ${oldSeller.id}`,
+          { 
+            type: QueryTypes.SELECT,
+          }
+        );
+
+        const successBidAmount = await sequelize.query(
+          `SELECT count(*) AS success_bid_amount FROM successbids 
+            INNER JOIN products ON successbids.product_id = products.id
+            INNER JOIN sellers ON products.seller_id = sellers.id
+            WHERE successbids.paid = 1 && sellers.id = ${oldSeller.id}`,
+          { 
+            type: QueryTypes.SELECT,
+          }
+        )
+
+        const participantBidAmount = await sequelize.query(
+          `SELECT count(*) AS participant_bid_amount FROM bids 
+            INNER JOIN products ON bids.product_id = products.id
+            INNER JOIN sellers ON products.seller_id = sellers.id
+            WHERE sellers.id = ${oldSeller.id}`,
+          {
+            type: QueryTypes.SELECT,
+          }
+        )
+
+        const successOrderAmount = await sequelize.query(
+          `SELECT count(*) AS success_order_amount FROM orders 
+            INNER JOIN orderitems ON orderitems.order_id = orders.id 
+            INNER JOIN successbids ON orderitems.success_bid_id = successbids.id 
+            INNER JOIN products ON successbids.product_id = products.id 
+            INNER JOIN sellers ON products.seller_id = sellers.id 
+            WHERE successbids.paid = 1 AND orders.order_status_id = 2 AND sellers.id = ${oldSeller.id}`,
+          {
+            type: QueryTypes.SELECT,
+          }
+        )
+
+        const failOrderAmount = await sequelize.query(
+          `SELECT count(*) AS fail_order_amount FROM orders 
+            INNER JOIN orderitems ON orderitems.order_id = orders.id 
+            INNER JOIN successbids ON orderitems.success_bid_id = successbids.id 
+            INNER JOIN products ON successbids.product_id = products.id 
+            INNER JOIN sellers ON products.seller_id = sellers.id 
+            WHERE successbids.paid = 1 AND orders.order_status_id = 3 AND sellers.id = ${oldSeller.id}`,
+          {
+            type: QueryTypes.SELECT,
+          }
+        )
+
+        const orderTotal = await sequelize.query(
+          `SELECT count(*) AS order_total FROM orders 
+            INNER JOIN orderitems ON orderitems.order_id = orders.id 
+            INNER JOIN successbids ON orderitems.success_bid_id = successbids.id 
+            INNER JOIN products ON successbids.product_id = products.id 
+            INNER JOIN sellers ON products.seller_id = sellers.id 
+            WHERE successbids.paid = 1 AND sellers.id = ${oldSeller.id}`,
+          {
+            type: QueryTypes.SELECT,
+          }
+        )
+
+        const orderTotalInWaitingProcessStatus = await sequelize.query(
+          `SELECT count(*) as order_total_in_waiting_process_status FROM orders 
+            INNER JOIN orderitems ON orderitems.order_id = orders.id 
+            INNER JOIN successbids ON orderitems.success_bid_id = successbids.id 
+            INNER JOIN products ON successbids.product_id = products.id 
+            INNER JOIN sellers ON products.seller_id = sellers.id 
+            WHERE successbids.paid = 1 AND orders.order_status_id = 1 AND sellers.id = ${oldSeller.id}`,
+          {
+            type: QueryTypes.SELECT,
+          }
+        )
+
+        const orderTotalInPaidStatus = await sequelize.query(
+          `SELECT count(*) AS order_total_in_paid_status FROM orders 
+            INNER JOIN orderitems ON orderitems.order_id = orders.id 
+            INNER JOIN successbids ON orderitems.success_bid_id = successbids.id 
+            INNER JOIN products ON successbids.product_id = products.id 
+            INNER JOIN sellers ON products.seller_id = sellers.id 
+            WHERE successbids.paid = 1 AND orders.order_status_id = 2 AND sellers.id = ${oldSeller.id}`,
+          {
+            type: QueryTypes.SELECT,
+          }
+        )
+
+        const orderTotalInCancelStatus = await sequelize.query(
+          `SELECT count(*) AS order_total_in_cancel_status FROM orders 
+            INNER JOIN orderitems ON orderitems.order_id = orders.id 
+            INNER JOIN successbids ON orderitems.success_bid_id = successbids.id 
+            INNER JOIN products ON successbids.product_id = products.id 
+            INNER JOIN sellers ON products.seller_id = sellers.id 
+            WHERE successbids.paid = 1 AND orders.order_status_id = 3 AND sellers.id = ${oldSeller.id}`,
+          {
+            type: QueryTypes.SELECT,
+          }
+        )
+
+        const dashboard = {
+          successBidAmount,
+          revenue,
+          participantBidAmount,
+          successOrderAmount,
+          failOrderAmount,
+          orderTotal,
+          orderTotalInWaitingProcessStatus,
+          orderTotalInPaidStatus,
+          orderTotalInCancelStatus,
+        };
+
+        if(!dashboard) {
+          return false;
+        }
+
+        return dashboard;
+      } else {
+        return false;
+      }
+    } catch (error) {
+      return false;
+    }
   }
 }
 

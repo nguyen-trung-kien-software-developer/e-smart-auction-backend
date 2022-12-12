@@ -248,6 +248,42 @@ class SellerController {
       res.status(500).send(error);
     }
   }
+
+  // [GET]: /get-wallet
+  getWallet = async (req, res) => {
+    try {
+      const user = req.user;
+
+      const wallet = await sellerService.getWallet(user);
+
+      if (!wallet) {
+        res.status(404).send("NOT FOUND!!!");
+        return;
+      }
+      
+      res.status(200).send(wallet);
+    } catch (error) {
+      res.status(500).send(error);
+    }
+  }
+
+  // [GET]: 
+  dashboard = async (req, res) => {
+    try {
+      const user = req.user;
+
+      const dashboard = await sellerService.getSellerDashboard(user);
+
+      if (!dashboard) {
+        res.status(404).send("NOT FOUND!!!");
+        return;
+      }
+
+      res.status(200).send(dashboard);
+  } catch (error) {
+      res.status(500).send(error); 
+  }
+}
 }
 
 module.exports = new SellerController();

@@ -1,9 +1,8 @@
 const { Op } = require("sequelize");
 const {
-  ParentCategory,
+  Product,
   FirstSubCategory,
   SecondSubCategory,
-  Product,
   Seller,
   Ward,
   District,
@@ -13,6 +12,7 @@ const {
   Bid,
   Buyer,
 } = require("../../models");
+const {stringToSlug} = require("../../utils/strHanlder");
 
 class ProductService {
   async getLastestProductListOrderByAuctionStartDesc() {
@@ -513,8 +513,8 @@ class ProductService {
                 as: "firstSubCategory",
                 include: [
                   {
-                    model: ParentCategory,
-                    as: "parentCategory",
+                    model: Product,
+                    as: "product",
                   },
                 ],
               },
@@ -577,6 +577,163 @@ class ProductService {
       return false;
     }
   }
+
+  getProductList = async (name) => {
+    let productList = null;
+    if (name) {
+      productList = await Product.findAll({
+        where: {
+          name: {
+            [Op.like]: `%${name}%`,
+          },
+        },
+      });
+    } else {
+      productList = await Product.findAll();
+    }
+
+    if (productList) {
+      return productList;
+    } else {
+      return false;
+    }
+  };
+
+  storeNewProduct = async (product) => {
+    try {
+      let { sku,
+          name,
+          hover_featured_image,
+          featured_image,
+          short_subscription,
+          description_detail,
+          additional_information,
+          condition,
+          price,
+          start_bid_amount,
+          current_bid_amount,
+          step_bid_amount,
+          auction_start,
+          auction_end,
+          category_id,
+          size_id,
+          seller,
+          color_id } = product;
+
+    const slug = stringToSlug(name);
+
+    const newProduct = await Product.create({
+        sku,
+        name,
+        hover_featured_image,
+        featured_image,
+        short_subscription,
+        description_detail,
+        additional_information,
+        condition,
+        price,
+        start_bid_amount,
+        current_bid_amount,
+        step_bid_amount,
+        auction_start,
+        auction_end,
+        category_id,
+        seller_id: seller,
+        size_id,
+        color_id,
+        slug,
+        created_date: Date.now(),
+    });
+
+    if(!newProduct) {
+      return false;
+    }
+
+    return newProduct;
+    } catch (err) {
+      console.log(err);
+      return false
+    }
+  };
+
+  updateProductById = async (id, newProduct) => {
+    try {
+      const oldProduct = await this.getProductById(id);
+
+    if (oldProduct) {
+      let { sku,
+          name,
+          hover_featured_image,
+          featured_image,
+          short_subscription,
+          description_detail,
+          additional_information,
+          condition,
+          price,
+          start_bid_amount,
+          current_bid_amount,
+          step_bid_amount,
+          auction_start,
+          auction_end,
+          category_id,
+          size_id,
+          color_id,
+        seller } = newProduct;
+
+      const slug = stringToSlug(name);
+
+      oldProduct.sku = sku;
+      oldProduct.name = name;
+      oldProduct.hover_featured_image = hover_featured_image;
+      oldProduct.featured_image = featured_image;
+      oldProduct.short_subscription = short_subscription;
+      oldProduct.description_detail = description_detail;
+      oldProduct.additional_information = additional_information;
+      oldProduct.condition = condition;
+      oldProduct.price = price;
+      oldProduct.start_bid_amount = start_bid_amount;
+      oldProduct.current_bid_amount = current_bid_amount;
+      oldProduct.step_bid_amount = step_bid_amount;
+      oldProduct.current_bid_amount = current_bid_amount;
+      oldProduct.auction_start = auction_start;
+      oldProduct.auction_end = auction_end;
+      oldProduct.category_id = category_id;
+      oldProduct.size_id = size_id;
+      oldProduct.color_id = color_id;
+      oldProduct.seller_id = seller;
+      oldProduct.slug = slug;
+      oldProduct.updatedAt = Date.now();
+
+      const updatedProduct = await oldProduct.save();
+
+      if(!updatedProduct) {
+        return false;
+      }
+
+      return updatedProduct;
+    } else {
+      return false;
+    }
+    } catch (error) {
+      return false
+    }
+  };
+
+  deleteProductById = async (id) => {
+    const oldProduct = await this.getProductById(id);
+
+    if (oldProduct) {
+      const deletedProduct = await Product.destroy({
+        where: {
+          id,
+        },
+      });
+
+      return deletedProduct;
+    } else {
+      return false;
+    }
+  };
 }
 
 module.exports = new ProductService();

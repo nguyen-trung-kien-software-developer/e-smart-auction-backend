@@ -25,4 +25,8 @@ sellerRouter.put("/update-product/:productId", authenticate, sellerController.up
 
 sellerRouter.delete("/delete-product/:productId", authenticate, sellerController.detroyProduct);
 
+sellerRouter.get("/get-wallet", authenticate, sellerController.getWallet);
+
+sellerRouter.get("/seller-dashboard", authenticate, sellerController.dashboard);
+
 module.exports = sellerRouter;

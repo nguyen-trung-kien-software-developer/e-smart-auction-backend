@@ -15,10 +15,17 @@ const bidRouter = require("./site/bid");
 const braintreeRouter = require("./site/braintree");
 const paymentRouter = require("./site/payment");
 const transportRouter = require("./site/transport");
+const buyerRouter = require("./site/buyer");
 const authRouter = require("./admin/auth");
 const adminUserRouter = require("./admin/user");
 const uploadRouter = require("./admin/upload");
-const buyerRouter = require("./site/buyer");
+const adminParentCategoryRouter = require("./admin/parentCategory");
+const adminFirstSubCategoryRouter = require("./admin/firstSubCategory");
+const adminSecondSubCategoryRouter = require("./admin/secondSubCategory");
+const adminTransportRouter = require("./admin/transport");
+const adminBidRouter = require("./admin/bid");
+const adminSuccessBidRouter = require("./admin/successBid");
+const adminProductRouter = require("./admin/product");
 
 const route = (app) => {
   // site
@@ -48,6 +55,13 @@ const route = (app) => {
   app.use("/admin", authRouter);
   app.use("/admin/user", adminUserRouter);
   app.use("/admin/upload", uploadRouter);
+  app.use("/admin/parent-category", adminParentCategoryRouter);
+  app.use("/admin/first-sub-category", adminFirstSubCategoryRouter);
+  app.use("/admin/second-sub-category", adminSecondSubCategoryRouter);
+  app.use("/admin/transport", adminTransportRouter);
+  app.use("/admin/bid", adminBidRouter);
+  app.use("/admin/success-bid", adminSuccessBidRouter);
+  app.use("/admin/product", adminProductRouter);
 };
 
 module.exports = route;
