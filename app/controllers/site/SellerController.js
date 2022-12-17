@@ -284,6 +284,58 @@ class SellerController {
       res.status(500).send(error); 
   }
 }
+
+  function (days) {
+  let date = new Date(this.valueOf());
+  date.setDate(date.getDate() + days);
+  return date;
+}
+
+  // [GET]: /get-data-chart
+  showDataChart = async (req, res) => {
+    try {
+      const user = req.user;
+
+      const data = await sellerService.getDataChart(user);
+
+      if (!data) {
+        res.status(404).send("NOT FOUND!!!");
+        return;
+      }
+
+      res.status(200).send(data);
+  } catch (error) {
+      res.status(500).send(error); 
+  }
+  }
+
+  // [POST]:  /send-withdraw-request
+  sendWithDrawRequest = async (req, res) => {
+    try {
+      const user = req.user;
+
+      const data = await sellerService.storeWithDrawRequest(req.body, user);
+
+      if(data == 2) {
+        res.status(500).send("Số tiền rút phải <= số tiền trong tài khoản");
+        return;
+      }
+
+      if(data == 3) {
+        res.status(500).send("Số tiền rút phải <= số tiền rút tối thiểu");
+        return;
+      }
+
+      if (!data) {
+        res.status(404).send("NOT FOUND!!!");
+        return;
+      }
+
+      res.status(200).send(data);
+  } catch (error) {
+      res.status(500).send(error); 
+  }
+  }
 }
 
 module.exports = new SellerController();

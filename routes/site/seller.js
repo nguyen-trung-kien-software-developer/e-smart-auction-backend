@@ -29,4 +29,8 @@ sellerRouter.get("/get-wallet", authenticate, sellerController.getWallet);
 
 sellerRouter.get("/seller-dashboard", authenticate, sellerController.dashboard);
 
+sellerRouter.get("/get-data-chart", authenticate, sellerController.showDataChart);
+
+sellerRouter.post("/send-withdraw-request", authenticate, sellerController.sendWithDrawRequest);
+
 module.exports = sellerRouter;

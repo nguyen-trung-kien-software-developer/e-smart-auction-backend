@@ -1,8 +1,20 @@
 const { Op } = require("sequelize");
 const bcrypt = require("bcryptjs");
-const { Seller, Ward, District, Province, Product, sequelize } = require("../../models");
+const { Seller, Ward, District, Province, Product, sequelize, WithDrawRequest } = require("../../models");
 const { QueryTypes } = require("sequelize");
 const {stringToSlug} = require("../../utils/strHanlder");
+const Moment = require("moment");
+
+Date.prototype.addDays = function (days) {
+  let date = new Date(this.valueOf());
+  date.setDate(date.getDate() + days);
+  return date;
+}
+
+const toTimeStamp = (strDate) => { 
+ const dt = Date.parse(strDate); 
+ return dt / 1000; 
+} 
 
 class SellerService {
   getAllSellers = async (page, name) => {
@@ -648,7 +660,7 @@ class SellerService {
           `SELECT sum(successbids.win_bid_amount) AS revenue FROM successbids 
             INNER JOIN products ON successbids.product_id = products.id
             INNER JOIN sellers ON products.seller_id = sellers.id
-            WHERE sellers.id = ${oldSeller.id}`,
+            WHERE successbids.paid = 1 AND sellers.id = ${oldSeller.id}`,
           { 
             type: QueryTypes.SELECT,
           }
@@ -763,6 +775,292 @@ class SellerService {
         }
 
         return dashboard;
+      } else {
+        return false;
+      }
+    } catch (error) {
+      return false;
+    }
+  }
+
+  getDataChart = async (user) => {
+    try {
+      const { email, username, user_type } = user;
+
+      let oldSeller = await this.getSellerByEmail(email);
+
+      if (oldSeller) {
+        var date = new Date();
+                  
+        var firstDay = new Date(date.getFullYear(), date.getMonth(), 1);
+                      
+        // var lastDay = new Date(date.getFullYear(), date.getMonth() + 1, 0);
+
+        const queryDay1 = Moment(firstDay.addDays(0)).format("YYYY-MM-DD hh:mm:ss");
+        const queryDay2 = Moment(firstDay.addDays(4)).format("YYYY-MM-DD hh:mm:ss");
+        const queryDay3 = Moment(firstDay.addDays(9)).format("YYYY-MM-DD hh:mm:ss");
+        const queryDay4 = Moment(firstDay.addDays(14)).format("YYYY-MM-DD hh:mm:ss");
+        const queryDay5 = Moment(firstDay.addDays(19)).format("YYYY-MM-DD hh:mm:ss");
+        const queryDay6 = Moment(firstDay.addDays(24)).format("YYYY-MM-DD hh:mm:ss");
+        const queryDay7 = Moment(firstDay.addDays(29)).format("YYYY-MM-DD hh:mm:ss");
+
+        const orderTotal1 = await sequelize.query(
+          `SELECT count(*) AS value FROM orders
+          INNER JOIN orderitems ON orderitems.order_id = orders.id 
+          INNER JOIN successbids ON orderitems.success_bid_id = successbids.id 
+          INNER JOIN products ON successbids.product_id = products.id 
+          INNER JOIN sellers ON products.seller_id = sellers.id 
+          WHERE orders.order_status_id = 2 AND sellers.id = ${oldSeller.id} AND orders.created_date = '${queryDay1}'`,
+          {
+            type: QueryTypes.SELECT,
+          }
+        )
+
+        const orderTotal2 = await sequelize.query(
+          `SELECT count(*) AS value FROM orders
+          INNER JOIN orderitems ON orderitems.order_id = orders.id 
+          INNER JOIN successbids ON orderitems.success_bid_id = successbids.id 
+          INNER JOIN products ON successbids.product_id = products.id 
+          INNER JOIN sellers ON products.seller_id = sellers.id 
+          WHERE orders.order_status_id = 2 AND sellers.id = ${oldSeller.id} AND orders.created_date = '${queryDay2}'`,
+          {
+            type: QueryTypes.SELECT,
+          }
+        )
+
+        const orderTotal3 = await sequelize.query(
+          `SELECT count(*) AS value FROM orders
+          INNER JOIN orderitems ON orderitems.order_id = orders.id 
+          INNER JOIN successbids ON orderitems.success_bid_id = successbids.id 
+          INNER JOIN products ON successbids.product_id = products.id 
+          INNER JOIN sellers ON products.seller_id = sellers.id 
+          WHERE orders.order_status_id = 2 AND sellers.id = ${oldSeller.id} AND orders.created_date = '${queryDay3}'`,
+          {
+            type: QueryTypes.SELECT,
+          }
+        )
+
+        const orderTotal4 = await sequelize.query(
+          `SELECT count(*) AS value FROM orders
+          INNER JOIN orderitems ON orderitems.order_id = orders.id 
+          INNER JOIN successbids ON orderitems.success_bid_id = successbids.id 
+          INNER JOIN products ON successbids.product_id = products.id 
+          INNER JOIN sellers ON products.seller_id = sellers.id 
+          WHERE orders.order_status_id = 2 AND sellers.id = ${oldSeller.id} AND orders.created_date = '${queryDay4}'`,
+          {
+            type: QueryTypes.SELECT,
+          }
+        )
+
+        const orderTotal5 = await sequelize.query(
+          `SELECT count(*) AS value FROM orders
+          INNER JOIN orderitems ON orderitems.order_id = orders.id 
+          INNER JOIN successbids ON orderitems.success_bid_id = successbids.id 
+          INNER JOIN products ON successbids.product_id = products.id 
+          INNER JOIN sellers ON products.seller_id = sellers.id 
+          WHERE orders.order_status_id = 2 AND sellers.id = ${oldSeller.id} AND orders.created_date = '${queryDay5}'`,
+          {
+            type: QueryTypes.SELECT,
+          }
+        )
+
+        const orderTotal6 = await sequelize.query(
+          `SELECT count(*) AS value FROM orders
+          INNER JOIN orderitems ON orderitems.order_id = orders.id 
+          INNER JOIN successbids ON orderitems.success_bid_id = successbids.id 
+          INNER JOIN products ON successbids.product_id = products.id 
+          INNER JOIN sellers ON products.seller_id = sellers.id 
+          WHERE orders.order_status_id = 2 AND sellers.id = ${oldSeller.id} AND orders.created_date = '${queryDay6}'`,
+          {
+            type: QueryTypes.SELECT,
+          }
+        )
+
+        const orderTotal7 = await sequelize.query(
+          `SELECT count(*) AS value FROM orders
+          INNER JOIN orderitems ON orderitems.order_id = orders.id 
+          INNER JOIN successbids ON orderitems.success_bid_id = successbids.id 
+          INNER JOIN products ON successbids.product_id = products.id 
+          INNER JOIN sellers ON products.seller_id = sellers.id 
+          WHERE orders.order_status_id = 2 AND sellers.id = ${oldSeller.id} AND orders.created_date = '${queryDay7}'`,
+          {
+            type: QueryTypes.SELECT,
+          }
+        )
+
+        const revenue1 = await sequelize.query(
+          `SELECT sum(successbids.win_bid_amount) AS value FROM successbids 
+            INNER JOIN products ON successbids.product_id = products.id
+            INNER JOIN sellers ON products.seller_id = sellers.id
+            WHERE successbids.paid = 1 AND sellers.id = ${oldSeller.id} AND successbids.createdAt = '${queryDay1}'`,
+          { 
+            type: QueryTypes.SELECT,
+          }
+        );
+
+        const revenue2 = await sequelize.query(
+          `SELECT sum(successbids.win_bid_amount) AS value FROM successbids 
+            INNER JOIN products ON successbids.product_id = products.id
+            INNER JOIN sellers ON products.seller_id = sellers.id
+            WHERE successbids.paid = 1 AND sellers.id = ${oldSeller.id} AND successbids.createdAt = '${queryDay2}'`,
+          { 
+            type: QueryTypes.SELECT,
+          }
+        );
+
+        const revenue3 = await sequelize.query(
+          `SELECT sum(successbids.win_bid_amount) AS value FROM successbids 
+            INNER JOIN products ON successbids.product_id = products.id
+            INNER JOIN sellers ON products.seller_id = sellers.id
+            WHERE successbids.paid = 1 AND sellers.id = ${oldSeller.id} AND successbids.createdAt = '${queryDay3}'`,
+          { 
+            type: QueryTypes.SELECT,
+          }
+        );
+
+        const revenue4 = await sequelize.query(
+          `SELECT sum(successbids.win_bid_amount) AS value FROM successbids 
+            INNER JOIN products ON successbids.product_id = products.id
+            INNER JOIN sellers ON products.seller_id = sellers.id
+            WHERE successbids.paid = 1 AND sellers.id = ${oldSeller.id} AND successbids.createdAt = '${queryDay4}'`,
+          { 
+            type: QueryTypes.SELECT,
+          }
+        );
+
+        const revenue5 = await sequelize.query(
+          `SELECT sum(successbids.win_bid_amount) AS value FROM successbids 
+            INNER JOIN products ON successbids.product_id = products.id
+            INNER JOIN sellers ON products.seller_id = sellers.id
+            WHERE successbids.paid = 1 AND sellers.id = ${oldSeller.id} AND successbids.createdAt = '${queryDay5}'`,
+          { 
+            type: QueryTypes.SELECT,
+          }
+        );
+
+        const revenue6 = await sequelize.query(
+          `SELECT sum(successbids.win_bid_amount) AS value FROM successbids 
+            INNER JOIN products ON successbids.product_id = products.id
+            INNER JOIN sellers ON products.seller_id = sellers.id
+            WHERE successbids.paid = 1 AND sellers.id = ${oldSeller.id} AND successbids.createdAt = '${queryDay6}'`,
+          { 
+            type: QueryTypes.SELECT,
+          }
+        );
+
+        const revenue7 = await sequelize.query(
+          `SELECT sum(successbids.win_bid_amount) AS value FROM successbids 
+            INNER JOIN products ON successbids.product_id = products.id
+            INNER JOIN sellers ON products.seller_id = sellers.id
+            WHERE successbids.paid = 1 AND sellers.id = ${oldSeller.id} AND successbids.createdAt = '${queryDay7}'`,
+          { 
+            type: QueryTypes.SELECT,
+          }
+        );
+
+        const data = {
+          "order_quantity": {
+            column1: {
+            day1: queryDay1,
+            ...orderTotal1[0]
+          },
+          column2: {
+            day2: queryDay2,
+            ...orderTotal2[0]
+          },
+          column3: {
+            day3: queryDay3,
+            ...orderTotal3[0]
+          },
+          column4: {
+            day4: queryDay4,
+            ...orderTotal4[0]
+          },
+          column5: {
+            day5: queryDay5,
+            ...orderTotal5[0]
+          },
+          column6: {
+            day6: queryDay6,
+            ...orderTotal6[0]
+          },
+          column7: {
+            day7: queryDay7,
+            ...orderTotal7[0]
+          }
+          },
+          "revenue": {
+            column1: {
+              day1: queryDay1,
+            ...revenue1[0]
+            },
+            column2: {
+              day2: queryDay2,
+            ...revenue2[0]
+            },
+            column3: {
+              day3: queryDay3,
+            ...revenue3[0]
+            },
+            column4: {
+              day4: queryDay4,
+            ...revenue4[0]
+            },
+            column5: {
+              day5: queryDay5,
+            ...revenue5[0]
+            },
+            column6: {
+              day6: queryDay6,
+            ...revenue6[0]
+            },
+            column7: {
+              day7: queryDay7,
+            ...revenue7[0]
+            },
+          }
+        };
+
+        if(!data) {
+          return false;
+        }
+
+        return data;
+      } else {
+        return false;
+      }
+    } catch (error) {
+      return false;
+    }
+  }
+
+  storeWithDrawRequest = async (data, user) => {
+    try {
+      const { amount } = data;
+      const { email, username, user_type } = user;
+      let oldSeller = await this.getSellerByEmail(email);
+
+      console.log(oldSeller);
+      if (oldSeller) {
+        if(amount > oldSeller.wallet) {
+          return 2;
+        }
+
+        if(amount > oldSeller.minimum_withdraw) {
+          return 3;
+        }
+
+        const request = await WithDrawRequest.create({
+          seller_id: oldSeller.id,
+          amount,
+          is_withdraw: 0,
+        })
+
+        if(!request) {
+          return false;
+        }
+
+        return request;
       } else {
         return false;
       }
