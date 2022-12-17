@@ -26,6 +26,8 @@ const adminTransportRouter = require("./admin/transport");
 const adminBidRouter = require("./admin/bid");
 const adminSuccessBidRouter = require("./admin/successBid");
 const adminProductRouter = require("./admin/product");
+const withdrawRequestRouter = require("./admin/withdrawRequest");
+;
 
 const route = (app) => {
   // site
@@ -62,6 +64,7 @@ const route = (app) => {
   app.use("/admin/bid", adminBidRouter);
   app.use("/admin/success-bid", adminSuccessBidRouter);
   app.use("/admin/product", adminProductRouter);
+  app.use("/admin/withdraw", withdrawRequestRouter);
 };
 
 module.exports = route;
