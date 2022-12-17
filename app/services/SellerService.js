@@ -759,15 +759,15 @@ class SellerService {
         )
 
         const dashboard = {
-          successBidAmount,
-          revenue,
-          participantBidAmount,
-          successOrderAmount,
-          failOrderAmount,
-          orderTotal,
-          orderTotalInWaitingProcessStatus,
-          orderTotalInPaidStatus,
-          orderTotalInCancelStatus,
+          ...successBidAmount[0],
+          ...revenue[0],
+          ...participantBidAmount[0],
+          ...successOrderAmount[0],
+          ...failOrderAmount[0],
+          ...orderTotal[0],
+          ...orderTotalInWaitingProcessStatus[0],
+          ...orderTotalInPaidStatus[0],
+          ...orderTotalInCancelStatus[0],
         };
 
         if(!dashboard) {
