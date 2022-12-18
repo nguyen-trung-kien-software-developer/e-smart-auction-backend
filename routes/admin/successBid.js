@@ -7,4 +7,6 @@ successBidRouter.get("/", authenticate, successBidController.index);
 
 successBidRouter.get("/:id", authenticate, successBidController.edit);
 
+successBidRouter.delete("/:id", authenticate, successBidController.destroy);
+
 module.exports = successBidRouter;
