@@ -1,6 +1,7 @@
 const { Op } = require("sequelize");
 const {
   Product,
+  ParentCategory,
   FirstSubCategory,
   SecondSubCategory,
   Seller,
@@ -513,8 +514,8 @@ class ProductService {
                 as: "firstSubCategory",
                 include: [
                   {
-                    model: Product,
-                    as: "product",
+                    model: ParentCategory,
+                    as: "parentCategory",
                   },
                 ],
               },
@@ -543,6 +544,7 @@ class ProductService {
 
       return product;
     } catch (error) {
+      console.log(error)
       return false;
     }
   }

@@ -1,4 +1,4 @@
-const { OrderItem, SuccessBid } = require("../../models");
+const { OrderItem, SuccessBid, Product, Seller } = require("../../models");
 const buyerService = require("./BuyerService");
 const sellerService = require("./SellerService");
 
@@ -9,7 +9,6 @@ class OrderItemService {
 
       if(productType === 'normal_product') {
         requestedOrderItems.forEach(async (orderItem) => {
-
           let createdSuccessBid = null
 
           if (user_type === "customer") {
@@ -45,6 +44,22 @@ class OrderItemService {
   
           successBid.paid = 1;
           const updatedSuccessBid = await successBid.save();
+
+           const product = await Product.findOne({
+            where: {
+              id: orderItem.product_id,
+            }
+          });
+
+          const seller = await Seller.findOne({
+            where: {
+              id: product.seller_id,
+            }
+          });
+
+          seller.wallet = seller.wallet + product.price;
+          const updatedSeller = await seller.save();
+
         });
       } 
 
@@ -63,6 +78,21 @@ class OrderItemService {
   
           successBid.paid = 1;
           const updatedSuccessBid = await successBid.save();
+
+          const product = await Product.findOne({
+            where: {
+              id: successBid.product_id,
+            }
+          });
+
+          const seller = await Seller.findOne({
+            where: {
+              id: product.seller_id,
+            }
+          });
+
+          seller.wallet = seller.wallet + successBid.win_bid_amount;
+          const updatedSeller = await seller.save();
         });
       }
 

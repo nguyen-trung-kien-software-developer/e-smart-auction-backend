@@ -1,9 +1,16 @@
-const { WithDrawRequest } = require("../../models");
+const { WithDrawRequest, Seller } = require("../../models");
 const sellerService = require("./SellerService");
 
 class WithDrawRequestService {
   getWithdrawRequestList = async () => {
-    let withDrawRequestList = await WithDrawRequest.findAll();
+    let withDrawRequestList = await WithDrawRequest.findAll({
+      include: [
+        {
+          model: Seller,
+          as: "seller",
+        }
+      ]
+    });
 
     if (withDrawRequestList) {
       return withDrawRequestList;
@@ -17,6 +24,12 @@ class WithDrawRequestService {
       where: {
         id,
       },
+      include: [
+        {
+          model: Seller,
+          as: "seller",
+        }
+      ]
     });
 
     if (withDrawRequest) {
